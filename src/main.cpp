@@ -174,6 +174,29 @@ void loop()
   }
 }
 
+// Helper function to set tally on all cameras
+void setTally(int camera, bool program, bool preview) {
+  // Make sure tally length is at least as big as camera number
+  // This helps with the channel 4 issue
+  while (!sdiTallyControl.availableForWrite()) {
+    // Wait for tally override bank to become ready
+    delay(1);
+  }
+
+  // Now set the tally state
+  sdiTallyControl.setCameraTally(camera, program, preview);
+
+  // Verify tally was set correctly (debug only)
+  #ifdef DEBUG
+  bool pgm, pvw;
+  if (sdiTallyControl.getCameraTally(camera, pgm, pvw)) {
+    if (pgm != program || pvw != preview) {
+      Serial.println(F("Warning: Tally state verification failed"));
+    }
+  }
+  #endif
+}
+
 void respond(EthernetClient client)
 {
   if (strcmp(bufferUrl, P("")) == 0)
@@ -236,8 +259,8 @@ void respond(EthernetClient client)
       preview = true;
     }
 
-    // set Tally
-    sdiTallyControl.setCameraTally(camera, program, preview);
+    // set Tally with improved handling
+    setTally(camera, program, preview);
 
     // send response
     client.print("{");

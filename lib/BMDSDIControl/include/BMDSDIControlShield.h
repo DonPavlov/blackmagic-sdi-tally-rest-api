@@ -82,7 +82,7 @@ namespace BMD
 	{
 		value = 0;
 
-		for (int i = 0; i < sizeof(T); i++)
+		for (unsigned int i = 0; i < sizeof(T); i++)
 			value |= payload[i] << (8 * i);
 	}
 }

@@ -98,7 +98,7 @@ namespace BMD
 		writeCommandInt8(camera, category, parameter, operation, valueArray);
 	}
 
-	template <unsigned N>
+	template <unsigned int N>
 	void SDICameraControl::writeCommandInt8(byte camera, byte category, byte parameter, byte operation, int8_t (&values)[N]) const
 	{
 		const uint8_t kHeaderLength  = 4;
@@ -121,13 +121,13 @@ namespace BMD
 				operation,      // Operation
 			};
 
-		for (int i = 0; i < N; i++)
+		for (unsigned int i = 0; i < N; i++)
 			toLittleEndian<int8_t>((uint8_t*)&payload[kHeaderLength + 4 + (i * kParamLength)], values[i]);
 
 		write(payload);
 	}
 
-	template <unsigned N>
+	template <unsigned int N>
 	void SDICameraControl::writeCommandInt16(byte camera, byte category, byte parameter, byte operation, int16_t (&values)[N]) const
 	{
 		const uint8_t kHeaderLength  = 4;
@@ -150,7 +150,7 @@ namespace BMD
 				operation,      // Operation
 			};
 
-		for (int i = 0; i < N; i++)
+		for (unsigned int i = 0; i < N; i++)
 			toLittleEndian<int16_t>(&payload[kHeaderLength + 4 + (i * kParamLength)], values[i]);
 
 		write(payload);
@@ -162,7 +162,7 @@ namespace BMD
 		writeCommandInt16(camera, category, parameter, operation, valueArray);
 	}
 
-	template <unsigned N>
+	template <unsigned int N>
 	void SDICameraControl::writeCommandInt32(byte camera, byte category, byte parameter, byte operation, int32_t (&values)[N]) const
 	{
 		const uint8_t kHeaderLength  = 4;
@@ -185,7 +185,7 @@ namespace BMD
 				operation,      // Operation
 			};
 
-		for (int i = 0; i < N; i++)
+		for (unsigned int i = 0; i < N; i++)
 			toLittleEndian<int32_t>(&payload[kHeaderLength + 4 + (i * kParamLength)], values[i]);
 
 		write(payload);
@@ -197,7 +197,7 @@ namespace BMD
 		writeCommandInt32(camera, category, parameter, operation, valueArray);
 	}
 
-	template <unsigned N>
+	template <unsigned int N>
 	void SDICameraControl::writeCommandInt64(byte camera, byte category, byte parameter, byte operation, int64_t (&values)[N]) const
 	{
 		const uint8_t kHeaderLength  = 4;
@@ -220,7 +220,7 @@ namespace BMD
 				operation,      // Operation
 			};
 
-		for (int i = 0; i < N; i++)
+		for (unsigned int i = 0; i < N; i++)
 			toLittleEndian<int64_t>(&payload[kHeaderLength + 4 + (i * kParamLength)], values[i]);
 
 		write(payload);
@@ -237,7 +237,7 @@ namespace BMD
 		writeCommandUTF8(camera, category, parameter, operation, string.c_str());
 	}
 
-	template <unsigned N>
+	template <unsigned int N>
 	void SDICameraControl::writeCommandFixed16(byte camera, byte category, byte parameter, byte operation, float (&values)[N]) const
 	{
 		const uint8_t kHeaderLength  = 4;
