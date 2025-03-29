@@ -23,10 +23,10 @@ char p_buffer[150];
 // Ethernet Interface Settings
 byte mac[] =      { 0xA8, 0x61, 0x0A, 0xAE, 0x71, 0xBC };
 //IPAddress ip      (192, 168, 2, 205);  // Private static IP address
-IPAddress ip      (172, 17, 121, 64);  // Private static IP address
+IPAddress ip      (10, 1, 3, 4);  // Private static IP address
 //IPAddress myDns   (192, 168, 2, 1);   // DNS is not needed for this example
 //IPAddress gateway (0, 0, 0, 0);       // Default gateway disabled for security reasons
-IPAddress subnet  (255, 255, 255, 0); // Class C subnet; typical
+IPAddress subnet  (255, 255, 240, 0); // Class C subnet; typical
 
 // HTTP lives on TCP port 80
 EthernetServer server(80);
