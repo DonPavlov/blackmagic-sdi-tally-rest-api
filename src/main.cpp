@@ -175,7 +175,7 @@ void loop()
 }
 
 // Helper function to set tally on all cameras
-void setTally(int camera, bool program, bool preview) {
+bool setTally(int camera, bool program, bool preview) {
   // Make sure tally length is at least as big as camera number
   // This helps with the channel 4 issue
   while (!sdiTallyControl.availableForWrite()) {
@@ -186,15 +186,36 @@ void setTally(int camera, bool program, bool preview) {
   // Now set the tally state
   sdiTallyControl.setCameraTally(camera, program, preview);
 
-  // Verify tally was set correctly (debug only)
-  #ifdef DEBUG
-  bool pgm, pvw;
-  if (sdiTallyControl.getCameraTally(camera, pgm, pvw)) {
-    if (pgm != program || pvw != preview) {
-      Serial.println(F("Warning: Tally state verification failed"));
+  // Always verify tally was set correctly
+  bool pgm = false, pvw = false;
+  int retries = 3; // Allow up to 3 retries
+
+  while (retries > 0) {
+    if (sdiTallyControl.getCameraTally(camera, pgm, pvw)) {
+      if (pgm == program && pvw == preview) {
+        return true; // Success!
+      }
+      // If verification failed, try setting it again
+      sdiTallyControl.setCameraTally(camera, program, preview);
     }
+    delay(5); // Small delay between retries
+    retries--;
   }
-  #endif
+
+  // If we get here, verification failed after all retries
+  Serial.print(F("Error: Tally state verification failed for camera "));
+  Serial.print(camera);
+  Serial.print(F(" (wanted pgm:"));
+  Serial.print(program);
+  Serial.print(F(" pvw:"));
+  Serial.print(preview);
+  Serial.print(F(" got pgm:"));
+  Serial.print(pgm);
+  Serial.print(F(" pvw:"));
+  Serial.print(pvw);
+  Serial.println(F(")"));
+
+  return false;
 }
 
 void respond(EthernetClient client)
@@ -260,7 +281,7 @@ void respond(EthernetClient client)
     }
 
     // set Tally with improved handling
-    setTally(camera, program, preview);
+    bool success = setTally(camera, program, preview);
 
     // send response
     client.print("{");
@@ -272,6 +293,9 @@ void respond(EthernetClient client)
     client.print(", ");
     client.print("\"preview\": ");
     client.print(preview);
+    client.print(", ");
+    client.print("\"success\": ");
+    client.print(success ? "true" : "false");
     client.print("}");
   }
   else
@@ -298,6 +322,7 @@ void sendHttpResponseOk(EthernetClient client)
   // send a standard http response header
   client.println(P("HTTP/1.1 200 OK"));
   client.println(P("Content-Type: text/html"));
+  client.println(P("Cache-Control: no-store, no-cache, must-revalidate")); // Full cache control
   client.println(P("Connection: close")); // Fixed typo
   client.println();
 }
@@ -311,7 +336,8 @@ void sendJsonResponseOk(EthernetClient client)
   // send a standard http response header
   client.println(P("HTTP/1.1 200 OK"));
   client.println(P("Content-Type: application/json"));
-  client.println(P("Connection: close")); // Fixed typo
+  client.println(P("Cache-Control: no-store, no-cache, must-revalidate")); // Full cache control
+  client.println(P("Connection: close"));
   client.println();
 }
 
@@ -323,6 +349,7 @@ void sendHttp404(EthernetClient client)
 
   client.println(P("HTTP/1.1 404 Not Found"));
   client.println(P("Content-Type: text/html"));
+  client.println(P("Cache-Control: no-store, no-cache, must-revalidate")); // Full cache control
   client.println(P("Connection: close")); // Fixed typo
   client.println();
 }
