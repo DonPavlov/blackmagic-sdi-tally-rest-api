@@ -229,15 +229,38 @@ void respond(EthernetClient client)
 
     // send html page
     // max length:    -----------------------------------------------------------------------------------------------------------------------------------------------------  (149 chars)
-    client.println(P("<HTML><head><title>Blackmagic SDI Tally REST API</title></head><body><h1>Blackmagic SDI Tally REST API</h1>"));
+    client.println(P("<HTML><head><title>Blackmagic SDI Tally REST API</title>"));
+    client.println(P("<style>"));
+    client.println(P("body { font-family: Arial, sans-serif; margin: 40px; }"));
+    client.println(P("code { background: #f0f0f0; padding: 2px 5px; }"));
+    client.println(P("</style>"));
+    client.println(P("</head><body>"));
+    client.println(P("<h1>Blackmagic SDI Tally REST API</h1>"));
     client.println(P("<p>HTTP Bridge for the Blackmagic Arduino Shield to embed SDI Tally Metadata into an SDI Signal</p>"));
 
-    client.println(P("<h2>Control Tally Preview and Program on 4 cameras</h2>"));
+    client.println(P("<h2>Quick Test Links</h2>"));
     client.println(P("<ul>"));
-    client.println(P("<li><a href=\"tally?cam=1&pgm=1&pvw=1\">?cam=1&pgm=1&pvw=1</a></li>"));
+    client.println(P("<li><a href=\"status\">Get All Camera States</a></li>"));
+    client.println(P("<li>Camera 1: <a href=\"tally?cam=1&pgm=1&pvw=0\">Program</a> | <a href=\"tally?cam=1&pgm=0&pvw=1\">Preview</a> | <a href=\"tally?cam=1&pgm=0&pvw=0\">Off</a></li>"));
+    client.println(P("<li>Camera 2: <a href=\"tally?cam=2&pgm=1&pvw=0\">Program</a> | <a href=\"tally?cam=2&pgm=0&pvw=1\">Preview</a> | <a href=\"tally?cam=2&pgm=0&pvw=0\">Off</a></li>"));
     client.println(P("</ul>"));
 
-    client.println(P("<p>Get full documentation at <a href=\"http://github.com/airbenich/blackmagic-sdi-tally-rest-api\">Github</a><p>"));
+    client.println(P("<h2>API Endpoints</h2>"));
+    client.println(P("<h3>Get Status</h3>"));
+    client.println(P("<code>GET /status</code>"));
+    client.println(P("<p>Returns all camera states and device information.</p>"));
+
+    client.println(P("<h3>Set Tally State</h3>"));
+    client.println(P("<code>GET /tally?cam=[1-4]&pgm=[0,1]&pvw=[0,1]</code>"));
+    client.println(P("<p>Parameters:</p>"));
+    client.println(P("<ul>"));
+    client.println(P("<li><code>cam</code>: Camera number (1-4)</li>"));
+    client.println(P("<li><code>pgm</code>: Program state (0=off, 1=on)</li>"));
+    client.println(P("<li><code>pvw</code>: Preview state (0=off, 1=on)</li>"));
+    client.println(P("</ul>"));
+
+    client.println(P("<hr>"));
+    client.println(P("<p>Get full documentation at <a href=\"http://github.com/airbenich/blackmagic-sdi-tally-rest-api\">Github</a></p>"));
     client.println(P("</body></html>"));
   }
   else if (strcmp(bufferUrl, P("tally")) == 0)
@@ -296,6 +319,43 @@ void respond(EthernetClient client)
     client.print(", ");
     client.print("\"success\": ");
     client.print(success ? "true" : "false");
+    client.print("}");
+  }
+  else if (strcmp(bufferUrl, P("status")) == 0)
+  {
+    sendJsonResponseOk(client);
+    client.print("{");
+
+    // Device info
+    client.print("\"device\":\"bmd-sdi-tally\",");
+    client.print("\"version\":\"0.7\",");
+
+    // Camera states
+    client.print("\"cameras\":[");
+    for(int i = 1; i <= 4; i++) {
+        bool pgm = false, pvw = false;
+        bool success = sdiTallyControl.getCameraTally(i, pgm, pvw);
+
+        if(i > 1) client.print(",");
+        client.print("{");
+        client.print("\"id\":");
+        client.print(i);
+        client.print(",\"connected\":");
+        client.print(success ? "true" : "false");
+        client.print(",\"state\":{");
+        client.print("\"program\":");
+        client.print(pgm ? "1" : "0");
+        client.print(",\"preview\":");
+        client.print(pvw ? "1" : "0");
+        client.print("}}");
+    }
+    client.print("],");
+
+    // Overall device status
+    client.print("\"status\":{");
+    client.print("\"device_status\":\"active\"");
+    client.print("\"}");
+
     client.print("}");
   }
   else
