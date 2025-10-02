@@ -77,3 +77,6 @@ This API is compatible with Bitfocus Companion. Use the following settings:
 * Verify network connectivity by accessing the root page: [http://arduino-ip.local/](http://arduino-ip.local/)
 * Check camera connections using the [status endpoint](http://arduino-ip.local/status)
 * Monitor the Arduino's serial output for detailed error messages
+
+# Feedback
+Currently still unable to trigger as expected and a tally, if this shield is for example connected between camera 4 and the blackmagic multiview 4. I am unable to trigger any tally signal and the camera image stays black. 
