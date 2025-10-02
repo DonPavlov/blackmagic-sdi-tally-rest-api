@@ -243,6 +243,9 @@ void respond(EthernetClient client)
     client.println(P("<li><a href=\"status\">Get All Camera States</a></li>"));
     client.println(P("<li>Camera 1: <a href=\"tally?cam=1&pgm=1&pvw=0\">Program</a> | <a href=\"tally?cam=1&pgm=0&pvw=1\">Preview</a> | <a href=\"tally?cam=1&pgm=0&pvw=0\">Off</a></li>"));
     client.println(P("<li>Camera 2: <a href=\"tally?cam=2&pgm=1&pvw=0\">Program</a> | <a href=\"tally?cam=2&pgm=0&pvw=1\">Preview</a> | <a href=\"tally?cam=2&pgm=0&pvw=0\">Off</a></li>"));
+    client.println(P("<li>Camera 3: <a href=\"tally?cam=3&pgm=1&pvw=0\">Program</a> | <a href=\"tally?cam=3&pgm=0&pvw=1\">Preview</a> | <a href=\"tally?cam=3&pgm=0&pvw=0\">Off</a></li>"));
+    client.println(P("<li>Camera 4: <a href=\"tally?cam=4&pgm=1&pvw=0\">Program</a> | <a href=\"tally?cam=4&pgm=0&pvw=1\">Preview</a> | <a href=\"tally?cam=4&pgm=0&pvw=0\">Off</a></li>"));
+
     client.println(P("</ul>"));
 
     client.println(P("<h2>API Endpoints</h2>"));
@@ -354,7 +357,7 @@ void respond(EthernetClient client)
     // Overall device status
     client.print("\"status\":{");
     client.print("\"device_status\":\"active\"");
-    client.print("\"}");
+    client.print("}");
 
     client.print("}");
   }
